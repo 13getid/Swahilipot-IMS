@@ -1,0 +1,16 @@
+# Secrets — NEVER commit
+.env
+
+# Virtual environment
+venv/
+
+# Python junk
+__pycache__/
+*.pyc
+
+# User uploads
+media/
+
+# Editor/OS noise
+.vscode/
+.DS_Store
