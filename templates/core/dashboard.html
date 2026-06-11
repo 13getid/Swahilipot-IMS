@@ -1,0 +1,12 @@
+{% extends 'base_public.html' %}
+
+{% block content %}
+<div class="p-10">
+  <h1 class="font-display text-2xl font-bold">Karibu, {{ user.name }} 👋</h1>
+  <p class="mt-1 text-[#6b7280]">Role: {{ user.role }} · Department: {{ user.department }}</p>
+  <form method="post" action="{% url 'logout' %}" class="mt-6">
+    {% csrf_token %}
+    <button class="text-[#dc2626] font-medium">Log out</button>
+  </form>
+</div>
+{% endblock %}
