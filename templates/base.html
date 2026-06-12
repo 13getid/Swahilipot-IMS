@@ -22,7 +22,9 @@
       </a>
 
       {% if user.role == 'instructor' and user.department.has_trainees %}
-        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-[#374151] hover:bg-[#f1f5f9]">
+        <a href="{% url 'trainees' %}" 
+            class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm
+          {% if request.resolver_match.url_name == 'trainees' %}bg-brand-50 text-brand-600 font-medium{% else %}text-[#374151] hover:bg-[#f1f5f9]{% endif %}">
           <i data-lucide="users" class="w-4 h-4"></i> Trainees
         </a>
         <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-[#374151] hover:bg-[#f1f5f9]">
