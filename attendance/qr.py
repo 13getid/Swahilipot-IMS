@@ -9,5 +9,5 @@ def make_qr_data_uri(url):
     image.save(buffer, format='PNG')
     png_bytes = buffer.getvalue()
 
-    b64 = base64.b64decode(png_bytes).decode('ascii')
+    b64 = base64.b64encode(png_bytes).decode('ascii')
     return f'data:image/png;base64,{b64}'

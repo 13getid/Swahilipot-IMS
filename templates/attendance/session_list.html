@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block page_title %}Attendance{% endblock %}
+
+{% block main %}
+<div class="grid md:grid-cols-2 gap-6">
+
+  <!-- LEFT: generate + freshly made QR -->
+  <div class="space-y-6">
+    <div class="bg-white border border-[#e2e8f0] rounded-xl shadow-sm p-6">
+      <h3 class="font-display font-semibold text-lg mb-4">Generate New Session</h3>
+      <form method="post" action="{% url 'session_create' %}" class="space-y-3">
+        {% csrf_token %}
+        <input type="text" name="session_label" placeholder="e.g. Morning Session — June 3"
+               class="w-full h-11 px-3 rounded-lg border border-[#e2e8f0] focus:outline-none focus:ring-2 focus:ring-brand-500">
+        <button type="submit" class="w-full h-11 rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-sm font-medium">
+          Generate QR Code
+        </button>
+      </form>
+    </div>
+
+    {% if new_qr %}
+    <div class="bg-white border border-[#e2e8f0] rounded-xl shadow-sm p-6 text-center">
+      <p class="text-sm text-[#6b7280] mb-3">Scan to check in</p>
+      <img src="{{ new_qr }}" alt="QR code" class="mx-auto w-52 h-52">
+      <p class="mt-4 text-xs text-[#6b7280] break-all">{{ new_url }}</p>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- RIGHT: past sessions -->
+  <div class="bg-white border border-[#e2e8f0] rounded-xl shadow-sm p-6">
+    <h3 class="font-display font-semibold text-lg mb-4">Your Sessions</h3>
+    <div class="space-y-3">
+      {% for s in sessions %}
+      <div class="border border-[#e2e8f0] rounded-lg p-4">
+        <div class="flex items-center justify-between">
+          <p class="font-medium">{{ s.session_label|default:"Unnamed Session" }}</p>
+          {% if s.is_expired %}
+            <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-[#6b7280]/15 text-[#6b7280]">Expired</span>
+          {% else %}
+            <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-[#16a34a]/15 text-[#16a34a]">Active</span>
+          {% endif %}
+        </div>
+        <p class="text-xs text-[#6b7280] mt-1">{{ s.created_at|date:"d M Y, H:i" }}</p>
+        <p class="text-xs text-[#6b7280] mt-1">{{ s.records.count }} response{{ s.records.count|pluralize }}</p>
+      </div>
+      {% empty %}
+      <p class="text-sm text-[#6b7280] text-center py-6">No sessions yet. Generate your first one!</p>
+      {% endfor %}
+    </div>
+  </div>
+
+</div>
+{% endblock %}
