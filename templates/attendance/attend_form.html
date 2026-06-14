@@ -1,0 +1,35 @@
+{% extends 'base_public.html' %}
+{% block content %}
+<div class="min-h-screen flex items-center justify-center px-4 py-8">
+  <div class="w-full max-w-sm bg-white rounded-xl shadow-md border border-[#e2e8f0] p-6">
+    <div class="text-center mb-5">
+      <h1 class="font-display font-bold text-xl">
+        <span class="text-brand-600">Swahili</span><span class="text-[#374151]">Pot</span>
+      </h1>
+      <p class="text-sm text-[#374151] mt-2">{{ session.department.name }}</p>
+      {% if session.session_label %}<p class="text-xs text-[#6b7280]">{{ session.session_label }}</p>{% endif %}
+      <p class="text-xs text-[#6b7280] mt-1">Instructor: {{ session.instructor.name }}</p>
+    </div>
+
+    <form method="post" class="space-y-4">
+      {% csrf_token %}
+      <div>
+        <label class="block text-sm font-medium mb-1">Full Name</label>
+        <input type="text" name="trainee_name" required
+               class="w-full h-12 px-3 rounded-lg border border-[#e2e8f0] focus:outline-none focus:ring-2 focus:ring-brand-500">
+      </div>
+      <div>
+        <label class="block text-sm font-medium mb-1">Phone Number</label>
+        <input type="text" name="trainee_phone" required
+               class="w-full h-12 px-3 rounded-lg border border-[#e2e8f0] focus:outline-none focus:ring-2 focus:ring-brand-500">
+      </div>
+      <div>
+        <label class="block text-sm font-medium mb-1">Tasks Completed Today</label>
+        <textarea name="tasks_completed" required rows="3" placeholder="Briefly describe what you worked on today"
+                  class="w-full px-3 py-2 rounded-lg border border-[#e2e8f0] focus:outline-none focus:ring-2 focus:ring-brand-500"></textarea>
+      </div>
+      <button type="submit" class="w-full h-12 rounded-lg bg-brand-600 hover:bg-brand-700 text-white font-medium">Check In</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

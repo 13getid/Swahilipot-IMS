@@ -44,6 +44,8 @@
         </div>
         <p class="text-xs text-[#6b7280] mt-1">{{ s.created_at|date:"d M Y, H:i" }}</p>
         <p class="text-xs text-[#6b7280] mt-1">{{ s.records.count }} response{{ s.records.count|pluralize }}</p>
+        <a href="{% url 'session_detail' s.id %}"
+        class="inline-block mt-2 text-sm text-brand-600 hover:underline">View Responses →</a>
       </div>
       {% empty %}
       <p class="text-sm text-[#6b7280] text-center py-6">No sessions yet. Generate your first one!</p>
