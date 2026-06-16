@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'accounts',
     'trainees',
     'attendance',
+    'submissions',
 ]
 
 MIDDLEWARE = [
@@ -126,3 +127,6 @@ AUTH_USER_MODEL = 'accounts.User'
 
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'dashboard'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
