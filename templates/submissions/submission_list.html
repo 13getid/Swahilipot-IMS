@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block page_title %}Submissions{% endblock %}
+
+{% block main %}
+<div class="flex items-center justify-between mb-5">
+  <div class="flex gap-2">
+    {% for tab in 'all,submitted,acknowledged,returned' tabs %}
+      <a href="?status={{ tab }}"
+         class="px-3 py-1.5 rounded-lg text-sm capitalize
+                {% if status_filter == tab %}bg-brand-600 text-white{% else %}bg-white border border-[#e2e8f0] text-[#374151] hover:bg-[#f1f5f9]{% endif %}">
+        {{ tab }}
+      </a>
+    {% endfor %}
+  </div>
+  {% if user.role == 'instructor' %}
+    <a href="{% url 'submission_new' %}" class="h-10 px-4 rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-sm font-medium flex items-center">+ New Submission</a>
+  {% endif %}
+</div>
+
+<div class="bg-white border border-[#e2e8f0] rounded-xl shadow-sm overflow-hidden">
+  <table class="w-full text-sm">
+    <thead>
+      <tr class="text-left text-[#6b7280] border-b border-[#e2e8f0]">
+        <th class="px-4 py-3 font-medium">Title</th>
+        <th class="px-4 py-3 font-medium">Type</th>
+        {% if user.role == 'supervisor' %}<th class="px-4 py-3 font-medium">Instructor</th>{% endif %}
+        <th class="px-4 py-3 font-medium">Submitted</th>
+        <th class="px-4 py-3 font-medium">Status</th>
+        {% if user.role == 'supervisor' %}<th class="px-4 py-3 font-medium">Actions</th>{% endif %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for s in submissions %}
+      <tr class="border-b border-[#e2e8f0] odd:bg-[#f8faff] align-top">
+        <td class="px-4 py-3 font-medium">
+          {{ s.title }}
+          {% if s.description %}<p class="text-xs text-[#6b7280] mt-1">{{ s.description }}</p>{% endif %}
+          {% if s.attachment %}<a href="{{ s.attachment.url }}" target="_blank" class="text-xs text-brand-600 hover:underline mt-1 inline-block">📎 {{ s.attachment.name }}</a>{% endif %}
+          {% if s.supervisor_note %}<p class="text-xs text-[#d97706] mt-1">Note: {{ s.supervisor_note }}</p>{% endif %}
+        </td>
+        <td class="px-4 py-3 text-[#6b7280]">{{ s.form_type }}</td>
+        {% if user.role == 'supervisor' %}<td class="px-4 py-3">{{ s.instructor.name }}</td>{% endif %}
+        <td class="px-4 py-3 text-[#6b7280]">{{ s.submitted_at|date:"d M Y" }}</td>
+        <td class="px-4 py-3">
+          {% if s.status == 'submitted' %}<span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-[#1e40af]/15 text-[#1e40af]">Submitted</span>
+          {% elif s.status == 'acknowledged' %}<span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-[#16a34a]/15 text-[#16a34a]">Acknowledged</span>
+          {% else %}<span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-[#d97706]/15 text-[#d97706]">Returned</span>{% endif %}
+        </td>
+        {% if user.role == 'supervisor' %}
+        <td class="px-4 py-3">
+          {% if s.status == 'submitted' %}
+          <div class="flex gap-2">
+            <form method="post" action="{% url 'submission_acknowledge' s.id %}">
+              {% csrf_token %}
+              <button class="text-xs text-[#16a34a] hover:underline">Acknowledge</button>
+            </form>
+            <form method="post" action="{% url 'submission_return' s.id %}"
+                  onsubmit="return promptReturn(this);">
+              {% csrf_token %}
+              <input type="hidden" name="supervisor_note">
+              <button class="text-xs text-[#d97706] hover:underline">Return</button>
+            </form>
+          </div>
+          {% else %}
+          <span class="text-xs text-[#6b7280]">—</span>
+          {% endif %}
+        </td>
+        {% endif %}
+      </tr>
+      {% empty %}
+      <tr><td colspan="6" class="px-4 py-10 text-center text-[#6b7280]">No submissions yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<script>
+function promptReturn(form) {
+  const note = prompt('Why are you returning this submission? (required)');
+  if (!note) return false;
+  form.querySelector('input[name="supervisor_note"]').value = note;
+  return true;
+}
+</script>
+{% endblock %}
