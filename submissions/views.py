@@ -23,14 +23,14 @@ def submission_list(request):
     return render(request,'submissions/submission_list.html',{
         'submissions': submissions,
         'status_filter': status_filter,
-        'tabs':['all','submitted','acknowledge','returned']
+        'tabs':['all','submitted','acknowledged','returned']
     })  
 
 @login_required
 @role_required('instructor')
 def submission_create(request):
     if request.method == 'POST':
-        form = SubmissionForm(request.POST,request.FILES)
+        form = SubmissionForm(request.POST, request.FILES)
         if form.is_valid():
             submission = form.save(commit=False)
             submission.instructor = request.user
@@ -38,8 +38,11 @@ def submission_create(request):
             submission.save()
             messages.success(request, 'Submission filed successfully.')
             return redirect('submissions')
-        else:
-            return render(request,'submissions/submission_new.html', {'form': form})
+    else:
+        form = SubmissionForm()
+
+    return render(request, 'submissions/submission_new.html', {'form': form})
+
 
 @login_required
 @role_required('supervisor')

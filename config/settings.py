@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'trainees',
     'attendance',
     'submissions',
+    'downtime',
 ]
 
 MIDDLEWARE = [
