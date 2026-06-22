@@ -25,7 +25,8 @@ urlpatterns = [
      path('', include('core.urls')),
      path('',include('trainees.urls')),
      path('',include('attendance.urls')),
-     path('',include('submissions.urls'))
+     path('',include('submissions.urls')),
+     path('',include('downtime.urls')),
 
 ]
 

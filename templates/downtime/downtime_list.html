@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block page_title %}Downtime Reports{% endblock %}
+
+{% block main %}
+{% if user.role == 'instructor' %}
+<div class="flex justify-end mb-5">
+  <button onclick="document.getElementById('reportModal').classList.remove('hidden')"
+          class="h-10 px-4 rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-sm font-medium">
+    + Report Downtime
+  </button>
+</div>
+{% endif %}
+
+<div class="space-y-3">
+  {% for r in reports %}
+  <div class="bg-white border border-[#e2e8f0] rounded-xl shadow-sm p-5">
+    <div class="flex items-start justify-between">
+      <div>
+        <p class="font-display font-semibold">{{ r.frequency_band }}</p>
+        {% if user.role == 'supervisor' %}<p class="text-xs text-[#6b7280]">Reported by {{ r.instructor.name }}</p>{% endif %}
+      </div>
+      <div class="flex gap-2">
+        {% if r.severity == 'high' %}<span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-[#dc2626]/15 text-[#dc2626]">High</span>
+        {% elif r.severity == 'medium' %}<span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-[#d97706]/15 text-[#d97706]">Medium</span>
+        {% else %}<span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-[#16a34a]/15 text-[#16a34a]">Low</span>{% endif %}
+
+        {% if r.status == 'open' %}<span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-[#dc2626]/15 text-[#dc2626]">Open</span>
+        {% else %}<span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-[#16a34a]/15 text-[#16a34a]">Resolved</span>{% endif %}
+      </div>
+    </div>
+    <p class="text-sm text-[#374151] mt-2">{{ r.description }}</p>
+    <p class="text-xs text-[#6b7280] mt-1">{{ r.reported_at|date:"d M Y, H:i" }}</p>
+
+    {% if r.status == 'resolved' %}
+      <p class="text-xs text-[#16a34a] mt-2">Resolution: {{ r.resolution_note }}</p>
+    {% elif user.role == 'supervisor' %}
+      <form method="post" action="{% url 'downtime_resolve' r.id %}" onsubmit="return promptResolve(this);" class="mt-3">
+        {% csrf_token %}
+        <input type="hidden" name="resolution_note">
+        <button class="text-sm text-brand-600 hover:underline">Mark Resolved</button>
+      </form>
+    {% endif %}
+  </div>
+  {% empty %}
+  <div class="bg-white border border-[#e2e8f0] rounded-xl shadow-sm p-12 text-center">
+    <p class="text-sm text-[#6b7280]">No downtime reports yet.</p>
+  </div>
+  {% endfor %}
+</div>
+
+<!-- Report Modal -->
+<div id="reportModal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4">
+  <div class="bg-white w-full max-w-sm rounded-xl shadow-lg p-6">
+    <h3 class="font-display font-semibold text-lg mb-4">Report Downtime</h3>
+    <form method="post" action="{% url 'downtime_report' %}" class="space-y-4">
+      {% csrf_token %}
+      <div>
+        <label class="block text-sm font-medium mb-1">Frequency Band</label>
+        <input type="text" name="frequency_band" required placeholder="e.g. 88.9 FM"
+               class="w-full h-11 px-3 rounded-lg border border-[#e2e8f0] focus:outline-none focus:ring-2 focus:ring-brand-500">
+      </div>
+      <div>
+        <label class="block text-sm font-medium mb-1">Description</label>
+        <textarea name="description" required rows="3"
+                  class="w-full px-3 py-2 rounded-lg border border-[#e2e8f0] focus:outline-none focus:ring-2 focus:ring-brand-500"></textarea>
+      </div>
+      <div>
+        <label class="block text-sm font-medium mb-1">Severity</label>
+        <select name="severity" required
+                class="w-full h-11 px-3 rounded-lg border border-[#e2e8f0] focus:outline-none focus:ring-2 focus:ring-brand-500">
+          <option value="">Select…</option>
+          <option value="low">Low</option>
+          <option value="medium">Medium</option>
+          <option value="high">High</option>
+        </select>
+      </div>
+      <div class="flex gap-3 pt-2">
+        <button type="submit" class="flex-1 h-11 rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-sm font-medium">Submit</button>
+        <button type="button" onclick="document.getElementById('reportModal').classList.add('hidden')"
+                class="flex-1 h-11 rounded-lg border border-brand-600 text-brand-600 text-sm font-medium">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+function promptResolve(form) {
+  const note = prompt('How was this resolved? (required)');
+  if (!note) return false;
+  form.querySelector('input[name="resolution_note"]').value = note;
+  return true;
+}
+</script>
+{% endblock %}
